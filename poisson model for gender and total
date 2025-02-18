@@ -1,0 +1,21 @@
+import pandas as pd
+import statsmodels.api as sm
+from statsmodels.formula.api import poisson
+from sklearn.preprocessing import LabelEncoder
+
+# Load the data
+data = pd.read_csv('sales.csv')
+
+# Convert 'gender' column to +1 for 'male' and -1 for 'female'
+label_encoder = LabelEncoder()
+data['Gender'] = label_encoder.fit_transform(data['Gender']) * 2 - 1  # male becomes +1, female becomes -1
+
+# Define the model: Poisson regression with 'gender' as the independent variable and 'total' as the dependent variable
+X = sm.add_constant(data['Gender'])  # Adds constant term to the model
+y = data['Total']
+
+# Fit the Poisson regression model
+poisson_model = sm.GLM(y, X, family=sm.families.Poisson()).fit()
+
+# Display the model summary
+print(poisson_model.summary())
